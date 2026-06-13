@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projekt-Tracker</title>
+<style>
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a24;
+    --surface2: #22222e;
+    --border: #2e2e3e;
+    --accent: #7c3aed;
+    --accent-light: #a855f7;
+    --text: #e2e2f0;
+    --text-muted: #8888aa;
+    --todo: #3b82f6;
+    --in-progress: #f59e0b;
+    --done: #22c55e;
+    --bug: #ef4444;
+    --feature: #7c3aed;
+    --milestone: #06b6d4;
+    --high: #ef4444;
+    --medium: #f59e0b;
+    --low: #6b7280;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent-light), #38bdf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .project-name-input {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 1.25rem;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    max-width: 300px;
+    background: linear-gradient(135deg, var(--accent-light), #38bdf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .stat-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn:hover { background: var(--surface2); border-color: var(--accent); }
+
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    font-weight: 600;
+  }
+
+  .btn-primary:hover { background: var(--accent-light); border-color: var(--accent-light); }
+
+  .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
+
+  select {
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+
+  select:focus { outline: none; border-color: var(--accent); }
+
+  .search-input {
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.875rem;
+    width: 220px;
+  }
+
+  .search-input:focus { outline: none; border-color: var(--accent); }
+
+  .search-input::placeholder { color: var(--text-muted); }
+
+  .progress-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .progress-title { font-weight: 600; font-size: 0.9rem; }
+  .progress-pct { font-size: 1.5rem; font-weight: 700; color: var(--done); }
+
+  .progress-bar-track {
+    height: 8px;
+    background: var(--bg);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--done));
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+
+  .milestone-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .milestone-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .milestone-progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--bg);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .milestone-progress-fill {
+    height: 100%;
+    background: var(--milestone);
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .column {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    min-height: 400px;
+  }
+
+  .column-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .column-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .column-badge {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .tasks-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .task-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .task-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+  }
+
+  .task-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .task-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .task-title.done-text {
+    text-decoration: line-through;
+    color: var(--text-muted);
+  }
+
+  .task-actions {
+    display: flex;
+    gap: 0.3rem;
+    opacity: 0;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+  }
+
+  .task-card:hover .task-actions { opacity: 1; }
+
+  .icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0.1rem;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    transition: color 0.15s;
+  }
+
+  .icon-btn:hover { color: var(--text); }
+  .icon-btn.delete:hover { color: #ef4444; }
+
+  .task-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+  }
+
+  .tag {
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .tag-feature { background: rgba(124,58,237,0.2); color: var(--feature); }
+  .tag-bug { background: rgba(239,68,68,0.2); color: var(--bug); }
+  .tag-milestone { background: rgba(6,182,212,0.2); color: var(--milestone); }
+  .tag-task { background: rgba(100,116,139,0.2); color: #94a3b8; }
+
+  .priority-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .prio-high { background: var(--high); }
+  .prio-medium { background: var(--medium); }
+  .prio-low { background: var(--low); }
+
+  .task-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .task-date {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+  }
+
+  .task-date.overdue { color: var(--bug); }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .modal-overlay.hidden { display: none; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 520px;
+    padding: 1.5rem;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+  }
+
+  .modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .form-group { margin-bottom: 1rem; }
+
+  label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  textarea,
+  .modal select {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.875rem;
+    transition: border-color 0.15s;
+  }
+
+  input[type="text"]:focus,
+  input[type="date"]:focus,
+  textarea:focus,
+  .modal select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  textarea { resize: vertical; min-height: 80px; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .empty-state .icon { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.4; }
+
+  .view-toggle {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .view-btn {
+    padding: 0.4rem 0.75rem;
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.15s;
+  }
+
+  .view-btn.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  .list-view { display: none; }
+  .list-view.active { display: block; }
+  .board-view { display: block; }
+  .board-view.hidden { display: none; }
+
+  .list-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .list-table th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .list-table td {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .list-table tr:hover td { background: var(--surface2); }
+
+  .status-badge {
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .status-todo { background: rgba(59,130,246,0.2); color: var(--todo); }
+  .status-in-progress { background: rgba(245,158,11,0.2); color: var(--in-progress); }
+  .status-done { background: rgba(34,197,94,0.2); color: var(--done); }
+
+  @media (max-width: 900px) {
+    .board { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    main { padding: 1rem; }
+    header { padding: 0.75rem 1rem; }
+    .stats-bar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <input class="project-name-input" id="projectName" value="Mein Spiel" title="Klicken zum Umbenennen" />
+  <div class="stats-bar" id="statsBar"></div>
+  <div class="header-actions">
+    <span style="font-size:0.75rem;color:var(--text-muted)" id="saveStatus">Gespeichert</span>
+  </div>
+</header>
+
+<main>
+  <!-- Progress -->
+  <div class="progress-section">
+    <div class="progress-header">
+      <span class="progress-title">Gesamtfortschritt</span>
+      <span class="progress-pct" id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+    </div>
+    <div id="milestoneList" class="milestone-list"></div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button class="btn btn-primary" onclick="openModal()">+ Aufgabe</button>
+    <div class="view-toggle">
+      <button class="view-btn active" id="boardBtn" onclick="setView('board')">Board</button>
+      <button class="view-btn" id="listBtn" onclick="setView('list')">Liste</button>
+    </div>
+    <input class="search-input" type="text" placeholder="Suchen..." id="searchInput" oninput="render()" />
+    <select id="filterType" onchange="render()">
+      <option value="">Alle Typen</option>
+      <option value="feature">Feature</option>
+      <option value="bug">Bug</option>
+      <option value="milestone">Meilenstein</option>
+      <option value="task">Aufgabe</option>
+    </select>
+    <select id="filterPrio" onchange="render()">
+      <option value="">Alle Prioritäten</option>
+      <option value="high">Hoch</option>
+      <option value="medium">Mittel</option>
+      <option value="low">Niedrig</option>
+    </select>
+    <button class="btn btn-sm" onclick="exportData()" title="Als JSON exportieren">&#8595; Export</button>
+    <label class="btn btn-sm" title="JSON importieren">&#8593; Import<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+  </div>
+
+  <!-- Board View -->
+  <div class="board-view" id="boardView">
+    <div class="board">
+      <div class="column">
+        <div class="column-header">
+          <div class="column-title">
+            <span style="color:var(--todo)">●</span> Offen
+            <span class="column-badge" id="todoBadge">0</span>
+          </div>
+        </div>
+        <div class="tasks-list" id="todoList"></div>
+      </div>
+      <div class="column">
+        <div class="column-header">
+          <div class="column-title">
+            <span style="color:var(--in-progress)">●</span> In Arbeit
+            <span class="column-badge" id="inProgressBadge">0</span>
+          </div>
+        </div>
+        <div class="tasks-list" id="inProgressList"></div>
+      </div>
+      <div class="column">
+        <div class="column-header">
+          <div class="column-title">
+            <span style="color:var(--done)">●</span> Fertig
+            <span class="column-badge" id="doneBadge">0</span>
+          </div>
+        </div>
+        <div class="tasks-list" id="doneList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- List View -->
+  <div class="list-view" id="listView">
+    <table class="list-table">
+      <thead>
+        <tr>
+          <th>Titel</th>
+          <th>Typ</th>
+          <th>Priorität</th>
+          <th>Status</th>
+          <th>Fällig</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="listBody"></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- Modal -->
+<div class="modal-overlay hidden" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modalTitle">Neue Aufgabe</span>
+      <button class="icon-btn" onclick="closeModal()">✕</button>
+    </div>
+    <input type="hidden" id="editId" />
+    <div class="form-group">
+      <label>Titel *</label>
+      <input type="text" id="taskTitle" placeholder="Aufgabenname..." />
+    </div>
+    <div class="form-group">
+      <label>Beschreibung</label>
+      <textarea id="taskDesc" placeholder="Details..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Typ</label>
+        <select id="taskType">
+          <option value="task">Aufgabe</option>
+          <option value="feature">Feature</option>
+          <option value="bug">Bug</option>
+          <option value="milestone">Meilenstein</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Priorität</label>
+        <select id="taskPrio">
+          <option value="medium">Mittel</option>
+          <option value="high">Hoch</option>
+          <option value="low">Niedrig</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Status</label>
+        <select id="taskStatus">
+          <option value="todo">Offen</option>
+          <option value="in-progress">In Arbeit</option>
+          <option value="done">Fertig</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Fälligkeitsdatum</label>
+        <input type="date" id="taskDue" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Meilenstein</label>
+      <select id="taskMilestone">
+        <option value="">Kein Meilenstein</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-primary" onclick="saveTask()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'project-tracker-v1';
+let tasks = [];
+let currentView = 'board';
+let editingId = null;
+
+function load() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    const data = JSON.parse(raw);
+    tasks = data.tasks || [];
+    document.getElementById('projectName').value = data.projectName || 'Mein Spiel';
+  }
+  render();
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    projectName: document.getElementById('projectName').value,
+    tasks
+  }));
+  const el = document.getElementById('saveStatus');
+  el.textContent = 'Gespeichert ✓';
+  setTimeout(() => el.textContent = '', 2000);
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+function filtered() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const type = document.getElementById('filterType').value;
+  const prio = document.getElementById('filterPrio').value;
+  return tasks.filter(t => {
+    if (q && !t.title.toLowerCase().includes(q) && !t.desc.toLowerCase().includes(q)) return false;
+    if (type && t.type !== type) return false;
+    if (prio && t.prio !== prio) return false;
+    return true;
+  });
+}
+
+function render() {
+  const list = filtered();
+  renderProgress();
+  renderStats();
+  if (currentView === 'board') renderBoard(list);
+  else renderList(list);
+  updateMilestoneSelect();
+}
+
+function renderStats() {
+  const total = tasks.length;
+  const done = tasks.filter(t => t.status === 'done').length;
+  const inP = tasks.filter(t => t.status === 'in-progress').length;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat"><div class="stat-dot" style="background:var(--text-muted)"></div>${total} gesamt</div>
+    <div class="stat"><div class="stat-dot" style="background:var(--in-progress)"></div>${inP} aktiv</div>
+    <div class="stat"><div class="stat-dot" style="background:var(--done)"></div>${done} fertig</div>
+  `;
+}
+
+function renderProgress() {
+  const total = tasks.filter(t => t.type !== 'milestone').length;
+  const done = tasks.filter(t => t.type !== 'milestone' && t.status === 'done').length;
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressBar').style.width = pct + '%';
+
+  const milestones = tasks.filter(t => t.type === 'milestone');
+  const mlEl = document.getElementById('milestoneList');
+  if (milestones.length === 0) { mlEl.innerHTML = ''; return; }
+
+  mlEl.innerHTML = milestones.map(m => {
+    const related = tasks.filter(t => t.milestone === m.id && t.type !== 'milestone');
+    const mDone = related.filter(t => t.status === 'done').length;
+    const mPct = related.length > 0 ? Math.round(mDone / related.length * 100) : (m.status === 'done' ? 100 : 0);
+    return `
+      <div class="milestone-item">
+        <span style="color:var(--milestone);font-size:0.75rem">◆</span>
+        <span style="font-size:0.8rem;min-width:160px;color:var(--text)">${esc(m.title)}</span>
+        <div class="milestone-progress-bar">
+          <div class="milestone-progress-fill" style="width:${mPct}%"></div>
+        </div>
+        <span style="color:var(--text-muted);font-size:0.75rem;min-width:32px;text-align:right">${mPct}%</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderBoard(list) {
+  const todo = list.filter(t => t.status === 'todo');
+  const inp = list.filter(t => t.status === 'in-progress');
+  const done = list.filter(t => t.status === 'done');
+
+  document.getElementById('todoBadge').textContent = todo.length;
+  document.getElementById('inProgressBadge').textContent = inp.length;
+  document.getElementById('doneBadge').textContent = done.length;
+
+  document.getElementById('todoList').innerHTML = todo.length ? todo.map(taskCard).join('') : empty();
+  document.getElementById('inProgressList').innerHTML = inp.length ? inp.map(taskCard).join('') : empty();
+  document.getElementById('doneList').innerHTML = done.length ? done.map(taskCard).join('') : empty();
+}
+
+function renderList(list) {
+  const labels = { todo: 'Offen', 'in-progress': 'In Arbeit', done: 'Fertig' };
+  const typeLabels = { feature: 'Feature', bug: 'Bug', milestone: 'Meilenstein', task: 'Aufgabe' };
+  const prioLabels = { high: 'Hoch', medium: 'Mittel', low: 'Niedrig' };
+
+  document.getElementById('listBody').innerHTML = list.length ? list.map(t => `
+    <tr>
+      <td><span class="${t.status === 'done' ? 'done-text' : ''}">${esc(t.title)}</span></td>
+      <td><span class="tag tag-${t.type}">${typeLabels[t.type]}</span></td>
+      <td><span style="display:flex;align-items:center;gap:0.4rem"><span class="priority-dot prio-${t.prio}"></span>${prioLabels[t.prio]}</span></td>
+      <td><span class="status-badge status-${t.status}">${labels[t.status]}</span></td>
+      <td style="color:${isOverdue(t) ? 'var(--bug)' : 'var(--text-muted)'}">${t.due || '—'}</td>
+      <td>
+        <button class="icon-btn btn-sm" onclick="openModal('${t.id}')">✎</button>
+        <button class="icon-btn delete btn-sm" onclick="deleteTask('${t.id}')">✕</button>
+      </td>
+    </tr>
+  `).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem">Keine Aufgaben gefunden</td></tr>`;
+}
+
+function isOverdue(t) {
+  return t.due && t.status !== 'done' && new Date(t.due) < new Date();
+}
+
+function taskCard(t) {
+  const typeLabels = { feature: 'Feature', bug: 'Bug', milestone: 'Meilenstein', task: 'Aufgabe' };
+  return `
+    <div class="task-card" onclick="openModal('${t.id}')">
+      <div class="task-header">
+        <div class="task-title ${t.status === 'done' ? 'done-text' : ''}">${esc(t.title)}</div>
+        <div class="task-actions">
+          <button class="icon-btn delete" onclick="event.stopPropagation();deleteTask('${t.id}')" title="Löschen">✕</button>
+        </div>
+      </div>
+      ${t.desc ? `<div class="task-desc">${esc(t.desc)}</div>` : ''}
+      <div class="task-meta">
+        <span class="priority-dot prio-${t.prio}" title="${t.prio}"></span>
+        <span class="tag tag-${t.type}">${typeLabels[t.type]}</span>
+        ${t.due ? `<span class="task-date ${isOverdue(t) ? 'overdue' : ''}">📅 ${t.due}</span>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function empty() {
+  return `<div class="empty-state"><div class="icon">📋</div>Keine Aufgaben</div>`;
+}
+
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function updateMilestoneSelect() {
+  const sel = document.getElementById('taskMilestone');
+  const milestones = tasks.filter(t => t.type === 'milestone');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">Kein Meilenstein</option>' +
+    milestones.map(m => `<option value="${m.id}" ${m.id === current ? 'selected' : ''}>${esc(m.title)}</option>`).join('');
+}
+
+function openModal(id) {
+  editingId = id || null;
+  const overlay = document.getElementById('modalOverlay');
+  overlay.classList.remove('hidden');
+  updateMilestoneSelect();
+
+  if (id) {
+    const t = tasks.find(x => x.id === id);
+    document.getElementById('modalTitle').textContent = 'Aufgabe bearbeiten';
+    document.getElementById('taskTitle').value = t.title;
+    document.getElementById('taskDesc').value = t.desc;
+    document.getElementById('taskType').value = t.type;
+    document.getElementById('taskPrio').value = t.prio;
+    document.getElementById('taskStatus').value = t.status;
+    document.getElementById('taskDue').value = t.due || '';
+    document.getElementById('taskMilestone').value = t.milestone || '';
+  } else {
+    document.getElementById('modalTitle').textContent = 'Neue Aufgabe';
+    document.getElementById('taskTitle').value = '';
+    document.getElementById('taskDesc').value = '';
+    document.getElementById('taskType').value = 'task';
+    document.getElementById('taskPrio').value = 'medium';
+    document.getElementById('taskStatus').value = 'todo';
+    document.getElementById('taskDue').value = '';
+    document.getElementById('taskMilestone').value = '';
+  }
+  document.getElementById('taskTitle').focus();
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.add('hidden');
+  editingId = null;
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function saveTask() {
+  const title = document.getElementById('taskTitle').value.trim();
+  if (!title) { document.getElementById('taskTitle').focus(); return; }
+
+  const data = {
+    title,
+    desc: document.getElementById('taskDesc').value.trim(),
+    type: document.getElementById('taskType').value,
+    prio: document.getElementById('taskPrio').value,
+    status: document.getElementById('taskStatus').value,
+    due: document.getElementById('taskDue').value,
+    milestone: document.getElementById('taskMilestone').value,
+  };
+
+  if (editingId) {
+    const idx = tasks.findIndex(t => t.id === editingId);
+    tasks[idx] = { ...tasks[idx], ...data };
+  } else {
+    tasks.push({ id: uid(), created: new Date().toISOString(), ...data });
+  }
+
+  closeModal();
+  save();
+  render();
+}
+
+function deleteTask(id) {
+  if (!confirm('Aufgabe löschen?')) return;
+  tasks = tasks.filter(t => t.id !== id);
+  save();
+  render();
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('boardView').classList.toggle('hidden', v !== 'board');
+  document.getElementById('listView').classList.toggle('active', v === 'list');
+  document.getElementById('boardBtn').classList.toggle('active', v === 'board');
+  document.getElementById('listBtn').classList.toggle('active', v === 'list');
+  render();
+}
+
+function exportData() {
+  const data = {
+    projectName: document.getElementById('projectName').value,
+    tasks,
+    exported: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'projekt-tracker.json';
+  a.click();
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const data = JSON.parse(ev.target.result);
+    tasks = data.tasks || [];
+    if (data.projectName) document.getElementById('projectName').value = data.projectName;
+    save();
+    render();
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+document.getElementById('projectName').addEventListener('change', save);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Enter' && !e.shiftKey && document.activeElement.tagName !== 'TEXTAREA') {
+    if (!document.getElementById('modalOverlay').classList.contains('hidden')) {
+      e.preventDefault();
+      saveTask();
+    }
+  }
+  if (e.key === 'n' && e.ctrlKey) { e.preventDefault(); openModal(); }
+});
+
+load();
+</script>
+</body>
+</html>
