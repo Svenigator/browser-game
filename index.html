@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rette den König!</title>
+<style>
+:root { --gold:#f5c842; --red:#e74c3c; --green:#2ecc71; }
+*{ margin:0; padding:0; box-sizing:border-box; }
+body{ font-family:'Segoe UI',system-ui,sans-serif; background:#060610; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+.game{ width:420px; max-width:100vw; background:#11111e; border-radius:20px; overflow:hidden; box-shadow:0 40px 100px rgba(0,0,0,0.9); position:relative; user-select:none; -webkit-user-select:none; }
+.screen{ display:none; }
+.screen.active{ display:block; }
+
+/* START */
+#ss{ background:radial-gradient(ellipse at 50% 0%,#2d1b4e,#11111e); padding:3rem 2rem; text-align:center; }
+.ki{ font-size:6rem; display:block; animation:float 2s ease-in-out infinite; margin-bottom:1.5rem; }
+.gt{ font-size:2.2rem; font-weight:900; color:var(--gold); text-shadow:0 0 40px rgba(245,200,66,.4); margin-bottom:.5rem; }
+.gs{ color:rgba(255,255,255,.4); font-size:.9rem; margin-bottom:3rem; }
+.bstart{ background:linear-gradient(135deg,var(--gold),#e67e22); color:#1a1000; font-size:1.1rem; font-weight:800; padding:.9rem 3rem; border:none; border-radius:50px; cursor:pointer; box-shadow:0 8px 30px rgba(245,200,66,.4); transition:transform .1s; letter-spacing:.05em; }
+.bstart:hover{ transform:translateY(-2px); }
+.bstart:active{ transform:scale(.97); }
+.si{ color:rgba(255,255,255,.2); font-size:.75rem; margin-top:1.5rem; }
+
+/* HEADER */
+.hdr{ background:rgba(0,0,0,.4); padding:.7rem 1.2rem; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.04); }
+.hlv{ font-size:.8rem; font-weight:700; color:var(--gold); letter-spacing:.06em; text-transform:uppercase; }
+.hli{ font-size:1.1rem; letter-spacing:.1rem; }
+
+/* SCENE */
+.scene{ position:relative; height:330px; overflow:hidden; }
+.sbg{ position:absolute; inset:0; }
+.stone{ position:absolute; inset:0; pointer-events:none; background-image:repeating-linear-gradient(0deg,transparent,transparent 29px,rgba(0,0,0,.07) 29px,rgba(0,0,0,.07) 31px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,0,0,.05) 39px,rgba(0,0,0,.05) 41px); }
+.king{ position:absolute; font-size:3rem; transform:translate(-50%,-50%); z-index:10; filter:drop-shadow(0 4px 12px rgba(0,0,0,.7)); pointer-events:none; }
+.king.idle{ animation:kIdle 2s ease-in-out infinite; }
+.king.scared{ animation:kScared .25s ease-in-out infinite; }
+.king.happy{ animation:kHappy .5s ease-in-out infinite; font-size:3.5rem; }
+.king.dead{ animation:kDead .8s ease forwards; }
+
+/* OBJECTS */
+.obj{ position:absolute; transform:translate(-50%,-50%); cursor:pointer; z-index:20; text-align:center; transition:opacity .3s; }
+.oi{ font-size:2.2rem; display:block; transition:transform .15s,filter .15s; filter:drop-shadow(0 3px 8px rgba(0,0,0,.6)); }
+.ot{ display:block; font-size:.62rem; color:rgba(255,255,255,.85); background:rgba(0,0,0,.65); backdrop-filter:blur(6px); border-radius:4px; padding:.1rem .35rem; margin-top:.15rem; white-space:nowrap; }
+.obj:not(.used):hover .oi{ transform:scale(1.2) translateY(-3px); }
+.obj.pulsing .oi{ animation:pulse 1.2s ease-in-out infinite; }
+.obj.correct .oi{ animation:pop .35s ease; filter:drop-shadow(0 0 14px rgba(46,204,113,.9)); }
+.obj.wrong .oi{ animation:objshake .4s ease; filter:drop-shadow(0 0 10px rgba(231,76,60,.9)); }
+.obj.used{ opacity:.35; pointer-events:none; }
+
+/* DANGER VISUALS */
+.d-water{ position:absolute; left:0; right:0; bottom:0; background:linear-gradient(180deg,rgba(33,150,243,.5),rgba(13,71,161,.9)); border-top:2px solid rgba(100,181,246,.5); transition:height .2s; }
+.d-fire{ position:absolute; left:0; top:0; bottom:0; width:0%; background:linear-gradient(90deg,rgba(220,50,0,.9),rgba(255,120,0,.5) 70%,transparent); transition:width .2s; }
+.d-lava{ position:absolute; left:0; right:0; bottom:0; height:0%; background:linear-gradient(180deg,rgba(255,80,0,.6),rgba(180,30,0,.95)); transition:height .2s; }
+.d-pit{ position:absolute; left:0; right:0; bottom:0; height:0%; background:linear-gradient(180deg,transparent,rgba(0,0,0,.95)); transition:height .3s; }
+
+/* OVERLAYS */
+.ov{ position:absolute; inset:0; z-index:100; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .3s; }
+.ov.show{ opacity:1; pointer-events:all; }
+.ov-win{ background:rgba(0,60,20,.9); }
+.ov-fail{ background:rgba(60,0,0,.9); }
+.ov-over{ background:rgba(0,0,0,.95); }
+.ov-emoji{ font-size:4rem; margin-bottom:.75rem; }
+.ov-title{ font-size:1.8rem; font-weight:900; color:#fff; margin-bottom:.4rem; }
+.ov-text{ font-size:.85rem; color:rgba(255,255,255,.65); text-align:center; padding:0 2rem; margin-bottom:1.5rem; line-height:1.5; }
+.bov{ padding:.7rem 2rem; border:none; border-radius:50px; font-size:.95rem; font-weight:700; cursor:pointer; transition:transform .1s; margin:.3rem; }
+.bov:active{ transform:scale(.96); }
+.bg{ background:var(--green); color:#fff; }
+.br{ background:var(--red); color:#fff; }
+.bgo{ background:var(--gold); color:#1a1000; }
+.stars{ position:absolute; inset:0; pointer-events:none; }
+.star{ position:absolute; font-size:1.5rem; animation:starUp 1.2s ease-out forwards; }
+
+/* FLASH */
+.flash{ position:absolute; inset:0; z-index:50; pointer-events:none; }
+.flash.r{ background:rgba(231,76,60,.45); }
+.flash.g{ background:rgba(46,204,113,.3); }
+
+/* BOTTOM UI */
+.hint{ padding:.45rem 1rem; background:rgba(245,200,66,.08); border-left:3px solid var(--gold); font-size:.78rem; color:rgba(255,255,255,.7); min-height:2.2rem; display:flex; align-items:center; }
+.seqbar{ padding:.5rem 1rem; background:rgba(0,0,0,.25); display:flex; align-items:center; gap:.35rem; overflow-x:auto; }
+.slbl{ font-size:.7rem; color:rgba(255,255,255,.3); margin-right:.25rem; white-space:nowrap; }
+.step{ width:30px; height:30px; border-radius:50%; border:2px solid rgba(255,255,255,.15); display:flex; align-items:center; justify-content:center; font-size:.85rem; color:rgba(255,255,255,.3); transition:all .25s; flex-shrink:0; }
+.step.done{ border-color:var(--green); background:rgba(46,204,113,.18); color:var(--green); }
+.step.cur{ border-color:var(--gold); background:rgba(245,200,66,.15); color:var(--gold); animation:stepGlow 1s infinite; }
+.sarrow{ color:rgba(255,255,255,.15); font-size:.75rem; flex-shrink:0; }
+.dw{ padding:.45rem 1rem .7rem; background:rgba(0,0,0,.3); }
+.dr{ display:flex; justify-content:space-between; font-size:.68rem; color:rgba(255,255,255,.4); margin-bottom:.25rem; text-transform:uppercase; letter-spacing:.03em; }
+.dt{ height:7px; background:rgba(255,255,255,.08); border-radius:99px; overflow:hidden; }
+.df{ height:100%; border-radius:99px; background:linear-gradient(90deg,#27ae60,#f39c12 60%,#e74c3c); transition:width .12s linear; }
+
+/* ANIMATIONS */
+@keyframes float{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-12px); } }
+@keyframes kIdle{ 0%,100%{ transform:translate(-50%,-50%) rotate(-2deg); } 50%{ transform:translate(-50%,-55%) rotate(2deg); } }
+@keyframes kScared{ 0%,100%{ transform:translate(-53%,-50%); } 50%{ transform:translate(-47%,-50%); } }
+@keyframes kHappy{ 0%,100%{ transform:translate(-50%,-50%) scale(1); } 50%{ transform:translate(-50%,-58%) scale(1.12) rotate(-5deg); } }
+@keyframes kDead{ 0%{ transform:translate(-50%,-50%) rotate(0); } 100%{ transform:translate(-50%,-20%) rotate(180deg); opacity:.2; } }
+@keyframes pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.1); } }
+@keyframes pop{ 0%{ transform:scale(1); } 50%{ transform:scale(1.5); } 100%{ transform:scale(1); } }
+@keyframes objshake{ 0%,100%{ transform:translateX(0) rotate(0); } 25%{ transform:translateX(-8px) rotate(-5deg); } 75%{ transform:translateX(8px) rotate(5deg); } }
+@keyframes stepGlow{ 0%,100%{ box-shadow:0 0 0 0 rgba(245,200,66,.4); } 50%{ box-shadow:0 0 0 5px rgba(245,200,66,0); } }
+@keyframes gameShake{ 0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-6px); } 40%{ transform:translateX(6px); } 60%{ transform:translateX(-4px); } 80%{ transform:translateX(4px); } }
+@keyframes starUp{ 0%{ transform:translateY(0) scale(0); opacity:1; } 100%{ transform:translateY(-160px) scale(1.3); opacity:0; } }
+.shaking{ animation:gameShake .4s ease !important; }
+@media(max-width:440px){ .game{ border-radius:0; } .scene{ height:270px; } }
+</style>
+</head>
+<body>
+<div class="game" id="G">
+  <div class="flash" id="fl"></div>
+
+  <!-- START SCREEN -->
+  <div class="screen active" id="ss">
+    <span class="ki">👑</span>
+    <div class="gt">Rette den König!</div>
+    <div class="gs">Klicke in der richtigen Reihenfolge</div>
+    <button class="bstart" onclick="startGame()">SPIELEN</button>
+    <div class="si">5 Rätsel · 3 Leben</div>
+    <br>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="screen" id="gs2">
+    <div class="hdr">
+      <div class="hlv" id="hlv">LEVEL 1 / 5</div>
+      <div class="hli" id="hli">❤️❤️❤️</div>
+    </div>
+    <div class="scene" id="scene">
+      <div class="sbg" id="sbg"></div>
+      <div class="stone"></div>
+      <div class="king idle" id="king">😱</div>
+      <div class="ov ov-win" id="ovW">
+        <div class="stars" id="stars"></div>
+        <div class="ov-emoji">🎉</div>
+        <div class="ov-title">Gerettet!</div>
+        <div class="ov-text" id="ovWt"></div>
+        <button class="bov bg" id="nxtBtn" onclick="nextLevel()">Weiter →</button>
+      </div>
+      <div class="ov ov-fail" id="ovF">
+        <div class="ov-emoji">😵</div>
+        <div class="ov-title">Zu spät!</div>
+        <div class="ov-text" id="ovFt"></div>
+        <button class="bov br" onclick="retry()">Nochmal ↺</button>
+      </div>
+      <div class="ov ov-over" id="ovO">
+        <div class="ov-emoji">😢</div>
+        <div class="ov-title">Game Over</div>
+        <div class="ov-text">Der König war verloren.<br>Versuch es nochmal!</div>
+        <button class="bov bgo" onclick="resetGame()">Neu starten</button>
+      </div>
+    </div>
+    <div class="hint" id="hint"></div>
+    <div class="seqbar" id="seqbar"></div>
+    <div class="dw">
+      <div class="dr"><span id="dlbl">⚠ Gefahr</span><span id="dpct">0%</span></div>
+      <div class="dt"><div class="df" id="df" style="width:0%"></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const LV = [
+  { title:'Der Keller', sub:'Wasser steigt — rette den König!',
+    bg:'linear-gradient(180deg,#0f1020,#1a2a40 50%,#0d2a5e 85%)',
+    danger:'water', ke:'😱', kp:{x:70,y:42}, tl:25,
+    objs:[
+      {id:'wrench',ic:'🔧',lb:'Rohrzange',x:18,y:68,o:1},
+      {id:'valve', ic:'🚰',lb:'Ventil',   x:48,y:36,o:2},
+      {id:'hatch', ic:'🚪',lb:'Falltür',  x:78,y:73,o:3},
+    ],
+    hints:['Schnapp dir die Rohrzange!','Drehe das Ventil zu!','Fliehe durch die Falltür!'],
+    wt:'Wasser gestoppt! Der König ist entkommen!',
+    ft:'Das Wasser hat den König überwältigt...',
+    dl:'💧 Wasserstand',
+  },
+  { title:'Das Feuer', sub:'Flammen breiten sich aus!',
+    bg:'linear-gradient(180deg,#1a0500,#3d1000 40%,#7a2000 80%)',
+    danger:'fire', ke:'😰', kp:{x:72,y:48}, tl:22,
+    objs:[
+      {id:'bucket',ic:'🪣',lb:'Eimer',  x:65,y:70,o:1},
+      {id:'well',  ic:'⛲',lb:'Brunnen',x:35,y:52,o:2},
+      {id:'fire',  ic:'🔥',lb:'Feuer',  x:15,y:43,o:3},
+      {id:'door',  ic:'🚪',lb:'Tür',    x:12,y:70,o:4},
+    ],
+    hints:['Nimm den Eimer!','Fülle ihn am Brunnen!','Lösche das Feuer!','Fliehe durch die Tür!'],
+    wt:'Feuer gelöscht! Der König ist in Sicherheit!',
+    ft:'Die Flammen haben den Weg versperrt...',
+    dl:'🔥 Feuerstärke',
+  },
+  { title:'Der Käfig', sub:'Der König ist eingesperrt — befreie ihn!',
+    bg:'linear-gradient(160deg,#0d0d1a,#1a1a2e)',
+    danger:'suspicion', ke:'😤', kp:{x:50,y:43}, tl:30,
+    objs:[
+      {id:'food', ic:'🍖',lb:'Fleisch',   x:75,y:67,o:1},
+      {id:'guard',ic:'💂',lb:'Wächter',   x:62,y:39,o:2},
+      {id:'key',  ic:'🗝️',lb:'Schlüssel', x:64,y:59,o:3},
+      {id:'lock', ic:'🔒',lb:'Schloss',   x:42,y:74,o:4},
+    ],
+    hints:['Locke den Wächter mit Fleisch!','Überwältige ihn!','Nimm den Schlüssel!','Öffne das Schloss!'],
+    wt:'Befreit! Der Wächter schläft tief und fest.',
+    ft:'Der Wächter wurde misstrauisch — Verstärkung kam!',
+    dl:'👁 Wachsamkeit',
+  },
+  { title:'Die Grube', sub:'Die Brücke bricht — handle schnell!',
+    bg:'linear-gradient(180deg,#1e1e30,#0d0d18 35%,#050505 65%,#000)',
+    danger:'pit', ke:'😨', kp:{x:50,y:36}, tl:20,
+    objs:[
+      {id:'hook', ic:'🪝',lb:'Haken',    x:82,y:26,o:1},
+      {id:'rope', ic:'🧵',lb:'Seil',     x:72,y:50,o:2},
+      {id:'swing',ic:'🤸',lb:'Schwingen',x:50,y:62,o:3},
+      {id:'ledge',ic:'🏔️',lb:'Vorsprung',x:18,y:33,o:4},
+    ],
+    hints:['Wirf den Haken!','Befestige das Seil!','Schwingt hindüber!','Greife den Felsvorsprung!'],
+    wt:'Über die Grube! Meisterhaft gesprungen!',
+    ft:'Das Seil riss — die Dunkelheit schluckte den König...',
+    dl:'🕳 Bruchlinie',
+  },
+  { title:'Der Drache', sub:'Ein Drache bewacht den Ausgang!',
+    bg:'linear-gradient(180deg,#1a0000,#3a0000 40%,#1a0800 80%)',
+    danger:'lava', ke:'😤', kp:{x:75,y:48}, tl:25,
+    objs:[
+      {id:'mirror',ic:'🪞',lb:'Spiegel', x:70,y:66,o:1},
+      {id:'dragon',ic:'🐉',lb:'Drache',  x:24,y:40,o:2},
+      {id:'sword', ic:'⚔️',lb:'Schwert', x:58,y:73,o:3},
+      {id:'exit',  ic:'✨',lb:'Ausgang', x:13,y:65,o:4},
+    ],
+    hints:['Halte den Spiegel vor dich!','Reflektiere das Feuer!','Greife das Schwert!','Stürme zum Ausgang!'],
+    wt:'Der Drache floh! Das Königreich ist gerettet! 👑',
+    ft:'Der Drache war mächtiger... Die Burg liegt in Asche.',
+    dl:'🌋 Lavalevel',
+  },
+];
+
+let S = {};
+
+function $i(id){ return document.getElementById(id); }
+
+function startGame(){
+  S = {lvl:0,lives:3,seq:[],anim:false,timer:null,danger:0};
+  $i('ss').classList.remove('active');
+  $i('gs2').classList.add('active');
+  loadLevel(0);
+}
+
+function loadLevel(i){
+  const L = LV[i];
+  S.seq=[]; S.danger=0; S.anim=false;
+  clearInterval(S.timer);
+
+  $i('hlv').textContent = `LEVEL ${i+1} / ${LV.length}`;
+  updateLives();
+  $i('sbg').style.background = L.bg;
+
+  // danger element
+  const old=$i('dEl'); if(old) old.remove();
+  const dEl=document.createElement('div');
+  dEl.id='dEl';
+  if(L.danger==='water'){ dEl.className='d-water'; dEl.style.height='5%'; }
+  else if(L.danger==='fire'){ dEl.className='d-fire'; dEl.style.width='0%'; }
+  else if(L.danger==='lava'){ dEl.className='d-lava'; dEl.style.height='0%'; }
+  else if(L.danger==='pit'||L.danger==='suspicion'){ dEl.className='d-pit'; dEl.style.height='0%'; }
+  $i('sbg').appendChild(dEl);
+
+  // king
+  const k=$i('king');
+  k.textContent=L.ke; k.style.left=L.kp.x+'%'; k.style.top=L.kp.y+'%'; k.className='king idle';
+
+  // remove old objects
+  document.querySelectorAll('.obj').forEach(o=>o.remove());
+
+  // add objects
+  const scene=$i('scene');
+  L.objs.forEach(obj=>{
+    const el=document.createElement('div');
+    el.className='obj pulsing'; el.id='o_'+obj.id;
+    el.style.left=obj.x+'%'; el.style.top=obj.y+'%';
+    el.innerHTML=`<span class="oi">${obj.ic}</span><span class="ot">${obj.lb}</span>`;
+    el.onclick=()=>click(obj.id);
+    scene.appendChild(el);
+  });
+
+  renderSeq(L);
+  $i('hint').textContent=L.sub;
+  $i('dlbl').textContent=L.dl;
+  $i('df').style.width='0%'; $i('dpct').textContent='0%';
+  ['ovW','ovF','ovO'].forEach(id=>$i(id).classList.remove('show'));
+
+  // timer
+  const ticks=L.tl*10; let t=0;
+  S.timer=setInterval(()=>{
+    t++; S.danger=Math.min(100,(t/ticks)*100);
+    const pct=Math.round(S.danger);
+    $i('df').style.width=pct+'%'; $i('dpct').textContent=pct+'%';
+    const dv=$i('dEl');
+    if(dv){
+      if(L.danger==='water') dv.style.height=(5+S.danger*.7)+'%';
+      else if(L.danger==='fire') dv.style.width=(S.danger*.4)+'%';
+      else if(L.danger==='lava') dv.style.height=(S.danger*.65)+'%';
+      else dv.style.height=(S.danger*.6)+'%';
+    }
+    if(pct>65) $i('king').className='king scared';
+    if(S.danger>=100){ clearInterval(S.timer); timerFail(); }
+  },100);
+}
+
+function renderSeq(L){
+  const bar=$i('seqbar');
+  bar.innerHTML='<span class="slbl">Reihenfolge:</span>';
+  L.objs.forEach((obj,i)=>{
+    const s=document.createElement('div'); s.className='step'; s.id='st_'+i; s.textContent=obj.ic; bar.appendChild(s);
+    if(i<L.objs.length-1){ const a=document.createElement('span'); a.className='sarrow'; a.textContent='→'; bar.appendChild(a); }
+  });
+  updateSeq(0);
+}
+
+function updateSeq(cur){
+  LV[S.lvl].objs.forEach((_,i)=>{
+    const el=$i('st_'+i); if(!el) return;
+    el.className='step'+(i<cur?' done':i===cur?' cur':'');
+  });
+}
+
+function click(id){
+  if(S.anim) return;
+  const L=LV[S.lvl], obj=L.objs.find(o=>o.id===id), exp=S.seq.length+1;
+  const el=$i('o_'+id);
+  if(obj.o===exp){
+    S.seq.push(id);
+    el.classList.remove('pulsing'); el.classList.add('correct');
+    setTimeout(()=>{ el.classList.add('used'); el.classList.remove('correct'); },350);
+    flash('g'); updateSeq(S.seq.length);
+    const ni=S.seq.length;
+    if(ni<L.hints.length) $i('hint').textContent='💡 '+L.hints[ni];
+    if(S.seq.length===L.objs.length){ clearInterval(S.timer); setTimeout(win,300); }
+  } else {
+    S.anim=true; el.classList.add('wrong'); flash('r'); shake();
+    S.lives--; updateLives();
+    S.danger=Math.min(95,S.danger+18);
+    $i('df').style.width=S.danger+'%'; $i('dpct').textContent=Math.round(S.danger)+'%';
+    setTimeout(()=>{
+      el.classList.remove('wrong'); S.anim=false;
+      if(S.lives<=0){ clearInterval(S.timer); $i('ovO').classList.add('show'); return; }
+      S.seq=[]; updateSeq(0);
+      document.querySelectorAll('.obj.used').forEach(o=>{ o.classList.remove('used'); o.classList.add('pulsing'); });
+      $i('hint').textContent='❌ Falsch! Fang von vorne an.';
+      setTimeout(()=>$i('hint').textContent='💡 '+LV[S.lvl].hints[0],1800);
+    },500);
+  }
+}
+
+function win(){
+  const L=LV[S.lvl];
+  $i('king').className='king happy'; $i('king').textContent='😄';
+  $i('ovWt').textContent=L.wt;
+  const btn=$i('nxtBtn');
+  if(S.lvl>=LV.length-1){ btn.textContent='🏆 Abschluss!'; btn.onclick=victory; }
+  else { btn.textContent='Weiter →'; btn.onclick=nextLevel; }
+  spawnStars(); $i('ovW').classList.add('show');
+}
+
+function timerFail(){
+  if($i('ovO').classList.contains('show')) return;
+  $i('king').className='king dead'; $i('king').textContent='😵';
+  S.lives--; updateLives();
+  $i('ovFt').textContent=LV[S.lvl].ft;
+  setTimeout(()=>{
+    if(S.lives<=0) $i('ovO').classList.add('show');
+    else $i('ovF').classList.add('show');
+  },700);
+}
+
+function nextLevel(){ S.lvl++; $i('ovW').classList.remove('show'); loadLevel(S.lvl); }
+function retry(){ $i('ovF').classList.remove('show'); loadLevel(S.lvl); }
+function resetGame(){ $i('gs2').classList.remove('active'); $i('ss').classList.add('active'); }
+
+function victory(){
+  $i('ovW').innerHTML=`
+    <div class="stars" id="stars"></div>
+    <div class="ov-emoji">👑</div>
+    <div class="ov-title" style="font-size:2rem">Königreich gerettet!</div>
+    <div class="ov-text">Du hast alle 5 Rätsel gelöst und den König in Sicherheit gebracht!</div>
+    <button class="bov bgo" onclick="resetGame()">Nochmal spielen</button>`;
+  $i('ovW').classList.add('show');
+  spawnStars();
+}
+
+function updateLives(){
+  $i('hli').textContent=Array.from({length:3},(_,i)=>i<S.lives?'❤️':'🖤').join('');
+}
+
+function flash(cls){
+  const el=$i('fl'); el.className='flash '+cls;
+  setTimeout(()=>el.className='flash',250);
+}
+
+function shake(){
+  const g=$i('G'); g.classList.add('shaking');
+  setTimeout(()=>g.classList.remove('shaking'),400);
+}
+
+function spawnStars(){
+  const c=$i('stars'); if(!c) return; c.innerHTML='';
+  ['⭐','🌟','✨','💫','🎊'].forEach((e,i)=>{
+    const s=document.createElement('div'); s.className='star'; s.textContent=e;
+    s.style.left=Math.random()*80+10+'%'; s.style.top=Math.random()*50+25+'%';
+    s.style.animationDelay=i*.15+'s'; c.appendChild(s);
+  });
+}
+</script>
+</body>
+</html>
