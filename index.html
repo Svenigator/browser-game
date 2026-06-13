@@ -6,94 +6,84 @@
 <title>Rette den König!</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#060610;display:flex;align-items:flex-start;justify-content:center;min-height:100vh;padding:1rem 0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#060610;display:flex;align-items:flex-start;justify-content:center;min-height:100vh;padding:.5rem 0}
 .game{width:420px;max-width:100vw;background:#11111e;border-radius:20px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.8);user-select:none;-webkit-user-select:none}
 .screen{display:none}.screen.active{display:block}
 
 /* START */
 #ss{text-align:center;padding:3.5rem 2rem;background:radial-gradient(ellipse at 50% 0%,#2d1b4e,#11111e);display:flex;flex-direction:column;align-items:center}
-.ss-k{font-size:5rem;animation:float 2s ease-in-out infinite;margin-bottom:1.5rem}
+.ss-k{font-size:4.5rem;animation:float 2s ease-in-out infinite;margin-bottom:1rem}
 .ss-t{font-size:2rem;font-weight:900;color:#f5c842;text-shadow:0 0 40px rgba(245,200,66,.4);margin-bottom:.4rem}
-.ss-s{color:rgba(255,255,255,.4);margin-bottom:2.5rem;font-size:.9rem}
+.ss-s{color:rgba(255,255,255,.45);margin-bottom:.5rem;font-size:.9rem;line-height:1.5}
+.ss-how{color:rgba(255,255,255,.3);font-size:.72rem;line-height:1.6;margin:1.5rem 0 2rem;max-width:280px}
 .ss-btn{background:linear-gradient(135deg,#f5c842,#e67e22);color:#1a1000;font-size:1.1rem;font-weight:800;padding:.9rem 3rem;border:none;border-radius:50px;cursor:pointer;letter-spacing:.05em;box-shadow:0 8px 30px rgba(245,200,66,.4);transition:transform .1s}
 .ss-btn:hover{transform:translateY(-2px)}
-.ss-info{color:rgba(255,255,255,.2);font-size:.75rem;margin-top:1.5rem}
+.ss-info{color:rgba(255,255,255,.2);font-size:.75rem;margin-top:1.2rem}
 
 /* HEADER */
-.hdr{background:rgba(0,0,0,.4);padding:.65rem 1.2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.04)}
+.hdr{background:rgba(0,0,0,.4);padding:.6rem 1.2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.04)}
 .hdr-t{font-size:.78rem;font-weight:700;color:#f5c842;letter-spacing:.04em;text-transform:uppercase}
-.hdr-l{font-size:1.1rem;letter-spacing:.08rem}
-
-/* SCENE */
-.scene{position:relative;height:200px;overflow:hidden}
-.sbg{position:absolute;inset:0}
-.stone{position:absolute;inset:0;pointer-events:none;background-image:repeating-linear-gradient(0deg,transparent,transparent 29px,rgba(0,0,0,.07) 29px,rgba(0,0,0,.07) 31px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,0,0,.05) 39px,rgba(0,0,0,.05) 41px)}
-.king{position:absolute;font-size:2.8rem;transform:translate(-50%,-50%);z-index:10;filter:drop-shadow(0 4px 12px rgba(0,0,0,.8));pointer-events:none}
-.king.idle{animation:kIdle 2s ease-in-out infinite}
-.king.scared{animation:kScared .25s ease-in-out infinite}
-.king.happy{animation:kHappy .5s ease-in-out infinite;font-size:3.2rem}
-
-/* Danger elements */
-.d-water{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(33,150,243,.45),rgba(13,71,161,.92));border-top:2px solid rgba(100,181,246,.5);transition:height .5s ease}
-.d-fire{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,rgba(220,50,0,.95),rgba(255,120,0,.6) 60%,transparent);transition:width .5s ease}
-.d-gate{position:absolute;font-size:4rem;transition:opacity .5s,transform .5s;filter:drop-shadow(0 0 15px rgba(245,200,66,.4));z-index:5}
-.d-bridge{position:absolute;bottom:28%;height:10px;background:linear-gradient(180deg,#a0522d,#6b3311);border-radius:3px;box-shadow:0 3px 8px rgba(0,0,0,.6);transition:width .5s ease}
-.d-dragon{position:absolute;font-size:3.5rem;filter:drop-shadow(0 0 12px rgba(255,50,0,.6));transition:all .5s ease;z-index:5}
+.hdr-l{font-size:1.05rem;letter-spacing:.08rem}
 
 /* OBJECTIVE */
-.obj-bar{padding:.55rem 1rem;background:rgba(0,0,0,.35);display:flex;align-items:center;gap:.75rem;border-bottom:1px solid rgba(255,255,255,.04)}
-.obj-ic{font-size:1.5rem;flex-shrink:0}
+.obj-bar{padding:.5rem 1rem;background:rgba(0,0,0,.3);display:flex;align-items:center;gap:.75rem}
+.obj-ic{font-size:1.4rem}
 .obj-inf{flex:1}
-.obj-lbl{font-size:.68rem;color:rgba(255,255,255,.45);margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.03em}
-.obj-track{height:10px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden}
-.obj-fill{height:100%;border-radius:99px;transition:width .4s ease}
-.obj-cnt{font-size:.85rem;font-weight:700;color:white;white-space:nowrap;min-width:40px;text-align:right}
+.obj-lbl{font-size:.66rem;color:rgba(255,255,255,.45);margin-bottom:.22rem;text-transform:uppercase;letter-spacing:.03em}
+.obj-track{height:9px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden}
+.obj-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#7f8c8d,#bdc3c7);transition:width .35s ease}
+.obj-cnt{font-size:.9rem;font-weight:800;color:white;white-space:nowrap;min-width:46px;text-align:right}
 
-/* GRID */
-.grid-sec{padding:.6rem .75rem;background:rgba(0,0,0,.2);display:flex;justify-content:center}
-.grid-wrap{position:relative}
-.tile{position:absolute;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:top .22s cubic-bezier(.2,.8,.4,1);box-shadow:0 4px 8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.25);will-change:top}
-.tile.sel{box-shadow:0 0 0 3px rgba(255,255,255,.9),0 4px 8px rgba(0,0,0,.4);transform:scale(1.1);z-index:5;transition:top .22s cubic-bezier(.2,.8,.4,1),transform .1s}
-.tile.out{animation:tileOut .3s ease forwards;pointer-events:none}
+/* BOARD */
+.board-sec{padding:.5rem .6rem;background:linear-gradient(180deg,#3a2418,#241610);display:flex;justify-content:center}
+.bw{position:relative;background:rgba(0,0,0,.35);border-radius:8px;padding:5px;box-shadow:inset 0 2px 10px rgba(0,0,0,.6)}
+.tile{position:absolute;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:top .2s cubic-bezier(.3,.7,.4,1),left .2s;box-shadow:0 3px 5px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.3);will-change:top}
+.tile.out{animation:tOut .26s ease forwards;pointer-events:none;z-index:6}
 .tile.enter{transition:none}
-.c-blue{background:linear-gradient(145deg,#5dade2,#2471a3)}
-.c-red{background:linear-gradient(145deg,#e74c3c,#b03a2e)}
-.c-green{background:linear-gradient(145deg,#52be80,#1e8449)}
-.c-yellow{background:linear-gradient(145deg,#f9e22e,#c9a800)}
-.c-purple{background:linear-gradient(145deg,#a569bd,#76448a)}
+.tile.hint-bad{animation:badShake .3s ease}
+.c-yellow{background:linear-gradient(145deg,#ffd84d,#e0a800)}
+.c-red{background:linear-gradient(145deg,#ff5a4d,#c0271a)}
+.c-blue{background:linear-gradient(145deg,#4db8ff,#1a6fc0)}
+.c-stone{background:radial-gradient(circle at 35% 30%,#5a5a62,#2a2a30 70%);box-shadow:0 3px 5px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -3px 6px rgba(0,0,0,.5);cursor:default}
 
-/* MOVES */
-.moves-bar{padding:.5rem 1.2rem;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.04)}
-.moves-n{font-size:1.5rem;font-weight:900;color:white;line-height:1}
-.moves-sub{font-size:.62rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.04em}
-.moves-warn{color:#e74c3c!important}
+/* BATTLE ZONE */
+.battle{position:relative;height:84px;background:linear-gradient(180deg,#241610,#0d0a06);overflow:hidden}
+.king-fig{position:absolute;left:5%;top:42%;transform:translate(-50%,-50%);font-size:2.3rem;z-index:4;filter:drop-shadow(0 3px 6px rgba(0,0,0,.7))}
+.king-fig.eaten{animation:eaten .6s ease forwards}
+.dragon-fig{position:absolute;top:42%;transform:translate(-50%,-50%);font-size:2.4rem;z-index:4;transition:left .35s ease;filter:drop-shadow(0 0 8px rgba(255,60,0,.6))}
+.dragon-fig.angry{animation:dragonPulse .4s ease-in-out infinite}
+.wall{position:absolute;left:11%;bottom:34%;display:flex;align-items:flex-end;gap:1px;z-index:3;height:40px}
+.wall .ws{font-size:.9rem;line-height:1;animation:dropIn .3s ease}
+.dz-track{position:absolute;left:1rem;right:1rem;bottom:.45rem;height:7px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;z-index:5}
+.dz-fill{height:100%;background:linear-gradient(90deg,#27ae60,#f39c12 55%,#e74c3c);transition:width .25s linear}
+.dz-lbl{position:absolute;left:1rem;bottom:1.1rem;font-size:.62rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.04em;z-index:5}
+
+/* flying stone */
+.fly-stone{position:fixed;z-index:700;pointer-events:none;border-radius:7px;background:radial-gradient(circle at 35% 30%,#5a5a62,#2a2a30 70%);box-shadow:0 3px 6px rgba(0,0,0,.6);transition:all .5s cubic-bezier(.5,0,.7,1)}
 
 /* OVERLAYS */
-.ov{position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
+.ov{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
 .ov.show{opacity:1;pointer-events:all}
 .ov-box{background:#1a1a2e;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:2rem;text-align:center;max-width:320px;width:90%;box-shadow:0 30px 60px rgba(0,0,0,.8)}
-.ov-em{font-size:3.5rem;margin-bottom:.75rem;display:block}
-.ov-ti{font-size:1.6rem;font-weight:900;color:white;margin-bottom:.5rem}
+.ov-em{font-size:3.5rem;margin-bottom:.6rem;display:block}
+.ov-ti{font-size:1.55rem;font-weight:900;color:white;margin-bottom:.5rem}
 .ov-tx{color:rgba(255,255,255,.55);font-size:.85rem;line-height:1.5;margin-bottom:1.5rem}
 .ov-btn{padding:.7rem 2rem;border:none;border-radius:50px;font-size:.95rem;font-weight:700;cursor:pointer;display:block;width:100%;margin-top:.5rem;transition:transform .1s}
 .ov-btn:hover{transform:scale(1.02)}
-.btn-g{background:#2ecc71;color:white}
-.btn-r{background:#e74c3c;color:white}
-.btn-o{background:#f5c842;color:#1a1000}
-.btn-d{background:rgba(255,255,255,.1);color:rgba(255,255,255,.5)}
+.btn-g{background:#2ecc71;color:white}.btn-r{background:#e74c3c;color:white}.btn-o{background:#f5c842;color:#1a1000}.btn-d{background:rgba(255,255,255,.1);color:rgba(255,255,255,.5)}
 
 /* CONFETTI */
 .conf-c{position:fixed;inset:0;pointer-events:none;z-index:600;overflow:hidden}
 .conf{position:absolute;animation:confFall 2s ease-out forwards}
 
-/* ANIMATIONS */
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-@keyframes kIdle{0%,100%{transform:translate(-50%,-50%) rotate(-2deg)}50%{transform:translate(-50%,-56%) rotate(2deg)}}
-@keyframes kScared{0%,100%{transform:translate(-53%,-50%)}50%{transform:translate(-47%,-50%)}}
-@keyframes kHappy{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-58%) scale(1.1) rotate(-5deg)}}
-@keyframes tileOut{0%{transform:scale(1);opacity:1}40%{transform:scale(1.35);opacity:.7}100%{transform:scale(0);opacity:0}}
+@keyframes tOut{0%{transform:scale(1);opacity:1}40%{transform:scale(1.3);opacity:.8}100%{transform:scale(0);opacity:0}}
+@keyframes badShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@keyframes dropIn{0%{transform:translateY(-12px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes dragonPulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.15)}}
+@keyframes eaten{0%{transform:translate(-50%,-50%) scale(1)}100%{transform:translate(-50%,-50%) scale(0) rotate(40deg);opacity:0}}
 @keyframes confFall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
-@media(max-width:440px){body{padding:.5rem 0}.game{border-radius:0}.scene{height:170px}}
+@media(max-width:440px){body{padding:0}.game{border-radius:0}}
 </style>
 </head>
 <body>
@@ -103,7 +93,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#060610;display:flex
   <div class="screen active" id="ss">
     <div class="ss-k">👑</div>
     <div class="ss-t">Rette den König!</div>
-    <div class="ss-s">Match-3 — befreie den König</div>
+    <div class="ss-s">Ein Drache will den König fressen!</div>
+    <div class="ss-how">Tippe Gruppen gleicher Steine, damit die <b>Felsen</b> nach unten rutschen. Sie blockieren den Drachen — schaffe alle raus, bevor der Drache den König erreicht!</div>
     <button class="ss-btn" onclick="startGame()">SPIELEN</button>
     <div class="ss-info">5 Level · 3 Leben</div>
   </div>
@@ -114,471 +105,368 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#060610;display:flex
       <div class="hdr-t" id="hdrT">Level 1</div>
       <div class="hdr-l" id="hdrL">❤️❤️❤️</div>
     </div>
-    <div class="scene" id="scene">
-      <div class="sbg" id="sbg"></div>
-      <div class="stone"></div>
-      <div class="king idle" id="king">😱</div>
-    </div>
     <div class="obj-bar">
-      <div class="obj-ic" id="oIc">💧</div>
+      <div class="obj-ic">🪨</div>
       <div class="obj-inf">
-        <div class="obj-lbl" id="oLb">Wasser sammeln</div>
+        <div class="obj-lbl">Felsen rausschieben</div>
         <div class="obj-track"><div class="obj-fill" id="oFl" style="width:0%"></div></div>
       </div>
-      <div class="obj-cnt" id="oCt">0/20</div>
+      <div class="obj-cnt" id="oCt">0/8</div>
     </div>
-    <div class="grid-sec"><div class="grid-wrap" id="gw"></div></div>
-    <div class="moves-bar">
-      <div><div class="moves-n" id="mN">30</div><div class="moves-sub">Züge</div></div>
-      <div style="text-align:right"><div style="font-size:.7rem;color:rgba(255,255,255,.3)">Kerben</div><div style="font-size:1rem;font-weight:700;color:white" id="mK">0</div></div>
+    <div class="board-sec"><div class="bw" id="bw"></div></div>
+    <div class="battle" id="battle">
+      <div class="king-fig" id="king">👑</div>
+      <div class="wall" id="wall"></div>
+      <div class="dragon-fig" id="dragon">🐉</div>
+      <div class="dz-lbl">🔥 Drache naht!</div>
+      <div class="dz-track"><div class="dz-fill" id="dzFl" style="width:0%"></div></div>
     </div>
   </div>
 </div>
 
 <!-- OVERLAYS -->
-<div class="ov" id="ovW">
-  <div class="ov-box">
-    <span class="ov-em">🎉</span>
-    <div class="ov-ti">Gerettet!</div>
-    <div class="ov-tx" id="ovWx"></div>
-    <button class="ov-btn btn-g" id="ovWb" onclick="nextLevel()">Weiter →</button>
-  </div>
-</div>
-<div class="ov" id="ovF">
-  <div class="ov-box">
-    <span class="ov-em">😵</span>
-    <div class="ov-ti">Keine Züge mehr!</div>
-    <div class="ov-tx" id="ovFx"></div>
-    <button class="ov-btn btn-r" onclick="retryLv()">Nochmal ↺</button>
-    <button class="ov-btn btn-d" onclick="toStart()">Menü</button>
-  </div>
-</div>
-<div class="ov" id="ovO">
-  <div class="ov-box">
-    <span class="ov-em">😢</span>
-    <div class="ov-ti">Game Over</div>
-    <div class="ov-tx">Alle Leben verloren. Der König konnte nicht gerettet werden.</div>
-    <button class="ov-btn btn-o" onclick="toStart()">Neu starten</button>
-  </div>
-</div>
+<div class="ov" id="ovW"><div class="ov-box">
+  <span class="ov-em">🎉</span>
+  <div class="ov-ti">Gerettet!</div>
+  <div class="ov-tx" id="ovWx"></div>
+  <button class="ov-btn btn-g" id="ovWb" onclick="nextLevel()">Weiter →</button>
+</div></div>
+<div class="ov" id="ovF"><div class="ov-box">
+  <span class="ov-em">🐉</span>
+  <div class="ov-ti">Aufgefressen!</div>
+  <div class="ov-tx" id="ovFx"></div>
+  <button class="ov-btn btn-r" onclick="retryLv()">Nochmal ↺</button>
+  <button class="ov-btn btn-d" onclick="toStart()">Menü</button>
+</div></div>
+<div class="ov" id="ovO"><div class="ov-box">
+  <span class="ov-em">😢</span>
+  <div class="ov-ti">Game Over</div>
+  <div class="ov-tx">Alle Leben verloren. Der Drache hat gesiegt.</div>
+  <button class="ov-btn btn-o" onclick="toStart()">Neu starten</button>
+</div></div>
 <div class="conf-c" id="cc"></div>
 
 <script>
-// ── CONSTANTS ──────────────────────────────────────────────
-const COLS = 7, ROWS = 7;
-const CLRS = ['blue','red','green','yellow','purple'];
-const EM = {blue:'💧',red:'🔥',green:'🍀',yellow:'⭐',purple:'💜'};
-let TS = 50, GAP = 3;
+// ── CONFIG ──────────────────────────────────────────────
+const COLS=7, ROWS=9, GAP=4;
+const CLRS=['yellow','red','blue'];
+const EM={yellow:'👑',red:'⚔️',blue:'🛡️'};
+let TS=48;
 
-// ── LEVELS ─────────────────────────────────────────────────
-const LVS = [
-  { n:'Level 1', title:'Der Keller',
-    bg:'linear-gradient(180deg,#0f1020 0%,#152040 55%,#0a2060)',
-    danger:'water', dPos:{bottom:'0',left:'0',right:'0'},
-    ke:'😱', kx:70, ky:38,
-    oc:'blue', on:20, oic:'💧', olb:'Wasser abpumpen', ohx:'#3498db',
-    mv:30,
-    wt:'Wasser abgelassen! Der König entkam durch die Falltür!',
-    ft:'Das Wasser stieg zu hoch — der König ertrank...' },
-  { n:'Level 2', title:'Das Feuer',
-    bg:'linear-gradient(180deg,#1a0500 0%,#3d1000 45%,#7a2000)',
-    danger:'fire', dPos:{left:'0',top:'0',bottom:'0'},
-    ke:'😰', kx:73, ky:45,
-    oc:'blue', on:18, oic:'💧', olb:'Feuer löschen', ohx:'#3498db',
-    mv:25,
-    wt:'Feuer gelöscht! Der König rannte zur Tür!',
-    ft:'Die Flammen sperrten den Weg ab...' },
-  { n:'Level 3', title:'Das Schloss',
-    bg:'linear-gradient(160deg,#0d0d1a,#1a1a2e)',
-    danger:'gate', dPos:{left:'50%',top:'50%',transform:'translate(-50%,-50%)'},
-    ke:'😤', kx:50, ky:40,
-    oc:'yellow', on:15, oic:'⭐', olb:'Schlüssel sammeln', ohx:'#f1c40f',
-    mv:25,
-    wt:'Tor geöffnet! Der König schritt frei hinaus!',
-    ft:'Zu wenig Schlüssel — das Tor blieb zu...' },
-  { n:'Level 4', title:'Die Schlucht',
-    bg:'linear-gradient(180deg,#1e1e30 0%,#0d0d18 40%,#050508)',
-    danger:'bridge', dPos:{bottom:'28%',right:'15%'},
-    ke:'😨', kx:68, ky:35,
-    oc:'green', on:20, oic:'🍀', olb:'Brücke bauen', ohx:'#27ae60',
-    mv:28,
-    wt:'Brücke gebaut! Der König überquerte die Schlucht!',
-    ft:'Zu wenig Holz — der König fiel in die Tiefe...' },
-  { n:'Level 5', title:'Der Drache',
-    bg:'linear-gradient(180deg,#1a0000 0%,#3a0000 45%,#150800)',
-    danger:'dragon', dPos:{left:'12%',top:'28%'},
-    ke:'😤', kx:73, ky:45,
-    oc:'purple', on:18, oic:'💜', olb:'Zauberkraft aufladen', ohx:'#9b59b6',
-    mv:30,
-    wt:'Drache bezähmt! Das Königreich ist gerettet! 👑',
-    ft:'Der Zauber war zu schwach — der Drache siegte...' },
+// ── LEVELS ──────────────────────────────────────────────
+const LVS=[
+  { n:'Level 1', stones:6,  time:55, dragon:'🐉',
+    wt:'Die Felsen blockieren den Drachen! Der König ist sicher!',
+    ft:'Der Drache erreichte den König zuerst...' },
+  { n:'Level 2', stones:8,  time:52, dragon:'🐉',
+    wt:'Geschafft! Der Drache kommt nicht durch die Felswand!',
+    ft:'Zu langsam — der Drache schnappte sich den König!' },
+  { n:'Level 3', stones:10, time:48, dragon:'🐲',
+    wt:'Stark! Die Felsen versperren dem Drachen den Weg!',
+    ft:'Der Drache war schneller als die Felsen...' },
+  { n:'Level 4', stones:12, time:44, dragon:'🐲',
+    wt:'Perfekt! Der König entkam dem Drachen!',
+    ft:'Knapp daneben — der Drache hat gewonnen!' },
+  { n:'Level 5', stones:14, time:42, dragon:'🔥🐉',
+    wt:'LEGENDÄR! Der Drachenkönig ist besiegt! Das Reich ist gerettet! 👑',
+    ft:'Der Drachenkönig war zu mächtig...' },
 ];
 
-// ── STATE ──────────────────────────────────────────────────
-let ST = {};
-let grid = [];        // [r][c] = tile obj | null
-let sel  = null;      // selected tile obj
-let busy = false;     // animation lock
-let won  = false;
-let gw;               // grid-wrap DOM element
+// ── STATE ───────────────────────────────────────────────
+let ST={};
+let grid=[];
+let busy=false, won=false, lost=false;
+let bw;
 
-// ── GAME FLOW ──────────────────────────────────────────────
-function startGame() {
-  ST = {lvl:0, lives:3, col:0, mv:0, kerb:0};
+// ── FLOW ────────────────────────────────────────────────
+function startGame(){
+  ST={lvl:0,lives:3};
   Q('ss').classList.remove('active');
   Q('gs').classList.add('active');
   loadLv(0);
 }
 
-function loadLv(i) {
-  const L = LVS[i];
-  ST.col  = 0;
-  ST.mv   = L.mv;
-  ST.kerb = 0;
-  sel  = null;
-  busy = false;
-  won  = false;
+function loadLv(i){
+  const L=LVS[i];
+  ST.dropped=0; ST.total=L.stones; ST.danger=0;
+  ST.rate=100/(L.time*10);
+  busy=false; won=false; lost=false;
+  clearInterval(ST.timer);
 
-  Q('hdrT').textContent = L.n + ': ' + L.title;
+  Q('hdrT').textContent=L.n;
   updateLives();
+  Q('oCt').textContent=`0/${L.stones}`;
+  Q('oFl').style.width='0%';
+  Q('wall').innerHTML='';
+  Q('king').textContent='👑';
+  Q('king').className='king-fig';
+  Q('dragon').textContent=L.dragon;
+  Q('dragon').className='dragon-fig';
+  Q('dragon').style.left='86%';
+  Q('dzFl').style.width='0%';
+  ['ovW','ovF','ovO'].forEach(id=>Q(id).classList.remove('show'));
 
-  // scene
-  Q('sbg').style.background = L.bg;
-  const kg = Q('king');
-  kg.textContent = L.ke;
-  kg.style.left  = L.kx + '%';
-  kg.style.top   = L.ky + '%';
-  kg.className   = 'king idle';
-
-  buildDanger(L);
-
-  // objective
-  Q('oIc').textContent = L.oic;
-  Q('oLb').textContent = L.olb;
-  Q('oFl').style.background = L.ohx;
-  Q('oFl').style.width = '0%';
-  Q('oCt').textContent = `0/${L.on}`;
-
-  // moves
-  Q('mN').textContent = L.mv;
-  Q('mN').className  = 'moves-n';
-  Q('mK').textContent = '0';
-
-  // grid
-  gw = Q('gw');
-  buildGrid();
-
-  // hide overlays
-  ['ovW','ovF','ovO'].forEach(id => Q(id).classList.remove('show'));
+  buildBoard(L);
+  startTimer();
 }
 
-function buildDanger(L) {
-  const old = Q('dEl'); if (old) old.remove();
-  const el  = document.createElement('div');
-  el.id = 'dEl';
+function buildBoard(L){
+  bw=Q('bw');
+  bw.innerHTML='';
+  const avail=bw.parentElement.clientWidth-22;
+  TS=Math.floor((avail-GAP*(COLS-1))/COLS);
+  const w=TS*COLS+GAP*(COLS-1), h=TS*ROWS+GAP*(ROWS-1);
+  bw.style.width=(w+10)+'px';
+  bw.style.height=(h+10)+'px';
 
-  if (L.danger === 'water') {
-    el.className = 'd-water';
-    el.style.height = '52%';
-  } else if (L.danger === 'fire') {
-    el.className = 'd-fire';
-    el.style.width = '34%';
-  } else if (L.danger === 'gate') {
-    el.className = 'd-gate';
-    el.style.left = '50%';
-    el.style.top  = '50%';
-    el.style.transform = 'translate(-50%,-50%)';
-    el.textContent = '🔒';
-  } else if (L.danger === 'bridge') {
-    el.className = 'd-bridge';
-    el.style.bottom = '28%';
-    el.style.right  = '15%';
-    el.style.width  = '0%';
-  } else if (L.danger === 'dragon') {
-    el.className = 'd-dragon';
-    el.style.left = '12%';
-    el.style.top  = '28%';
-    el.textContent = '🐉';
+  grid=[];
+  for(let r=0;r<ROWS;r++){
+    grid[r]=[];
+    for(let c=0;c<COLS;c++) grid[r][c]=mkTile(rndColor(),r,c,false);
   }
-
-  Q('scene').appendChild(el);
+  placeStones(L.stones);
 }
 
-// ── GRID BUILD ─────────────────────────────────────────────
-function buildGrid() {
-  gw.innerHTML = '';
-  const avail = gw.parentElement.clientWidth - 24;
-  TS = Math.floor((avail - GAP*(COLS-1)) / COLS);
-  gw.style.width  = (TS*COLS + GAP*(COLS-1)) + 'px';
-  gw.style.height = (TS*ROWS + GAP*(ROWS-1)) + 'px';
-
-  grid = [];
-  for (let r = 0; r < ROWS; r++) {
-    grid[r] = [];
-    for (let c = 0; c < COLS; c++) {
-      grid[r][c] = mkTile(safeColor(r,c), r, c, false);
-    }
+function placeStones(n){
+  const cand=[];
+  for(let r=1;r<=5;r++)
+    for(let c=0;c<COLS;c++) cand.push([r,c]);
+  // shuffle
+  for(let i=cand.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[cand[i],cand[j]]=[cand[j],cand[i]];}
+  for(let i=0;i<n && i<cand.length;i++){
+    const [r,c]=cand[i];
+    if(grid[r][c]) grid[r][c].el.remove();
+    grid[r][c]=mkStone(r,c);
   }
 }
 
-function safeColor(r, c) {
-  const ban = new Set();
-  if (c>=2 && grid[r][c-1] && grid[r][c-2] && grid[r][c-1].color===grid[r][c-2].color)
-    ban.add(grid[r][c-1].color);
-  if (r>=2 && grid[r-1]?.[c] && grid[r-2]?.[c] && grid[r-1][c].color===grid[r-2][c].color)
-    ban.add(grid[r-1][c].color);
-  const av = CLRS.filter(x => !ban.has(x));
-  return av[Math.floor(Math.random()*av.length)];
-}
+function rndColor(){ return CLRS[(Math.random()*CLRS.length)|0]; }
 
-function mkTile(color, r, c, entering) {
-  const el = document.createElement('div');
-  el.className = `tile c-${color}${entering?' enter':''}`;
-  const fs = Math.round(TS * 0.46);
-  el.style.cssText = `width:${TS}px;height:${TS}px;font-size:${fs}px;left:${c*(TS+GAP)}px;top:${entering?-(TS*2):r*(TS+GAP)}px`;
-  el.textContent = EM[color];
-  const t = {color, r, c, el};
-  el.addEventListener('click', () => { if (!busy) onTileClick(t); });
-  gw.appendChild(el);
-  if (entering) {
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      el.classList.remove('enter');
-      el.style.top = r*(TS+GAP) + 'px';
-    }));
-  }
+function mkTile(color,r,c,entering){
+  const el=document.createElement('div');
+  el.className=`tile c-${color}${entering?' enter':''}`;
+  const fs=Math.round(TS*0.5);
+  el.style.cssText=`width:${TS}px;height:${TS}px;font-size:${fs}px;left:${c*(TS+GAP)}px;top:${entering?-(TS*2):r*(TS+GAP)}px`;
+  el.textContent=EM[color];
+  const t={type:'tile',color,r,c,el};
+  el.addEventListener('click',()=>{ if(!busy&&!won&&!lost) tap(t); });
+  bw.appendChild(el);
+  if(entering) requestAnimationFrame(()=>requestAnimationFrame(()=>{el.classList.remove('enter');el.style.top=r*(TS+GAP)+'px';}));
   return t;
 }
 
-// ── CLICK / SWAP ───────────────────────────────────────────
-function onTileClick(t) {
-  if (busy || won || ST.mv <= 0) return;
-  if (!sel) {
-    sel = t; t.el.classList.add('sel'); return;
-  }
-  if (sel === t) {
-    t.el.classList.remove('sel'); sel = null; return;
-  }
-  const dr = Math.abs(sel.r-t.r), dc = Math.abs(sel.c-t.c);
-  if (dr+dc === 1) {
-    const a = sel; a.el.classList.remove('sel'); sel = null;
-    attemptSwap(a, t);
-  } else {
-    sel.el.classList.remove('sel'); sel = t; t.el.classList.add('sel');
-  }
+function mkStone(r,c){
+  const el=document.createElement('div');
+  el.className='tile c-stone';
+  el.style.cssText=`width:${TS}px;height:${TS}px;left:${c*(TS+GAP)}px;top:${r*(TS+GAP)}px`;
+  const t={type:'stone',r,c,el};
+  bw.appendChild(el);
+  return t;
 }
 
-async function attemptSwap(a, b) {
-  busy = true;
-  swapPair(a, b);
+// ── TAP / BLAST ─────────────────────────────────────────
+function tap(t){
+  const group=flood(t.r,t.c,t.color);
+  if(group.length<2){ t.el.classList.add('hint-bad'); setTimeout(()=>t.el.classList.remove('hint-bad'),300); return; }
+  blast(group);
+}
+
+function flood(sr,sc,color){
+  const seen=new Set(), stack=[[sr,sc]], res=[];
+  while(stack.length){
+    const [r,c]=stack.pop();
+    if(r<0||r>=ROWS||c<0||c>=COLS) continue;
+    const k=r*COLS+c;
+    if(seen.has(k)) continue;
+    seen.add(k);
+    const cell=grid[r][c];
+    if(!cell||cell.type!=='tile'||cell.color!==color) continue;
+    res.push({r,c});
+    stack.push([r-1,c],[r+1,c],[r,c-1],[r,c+1]);
+  }
+  return res;
+}
+
+async function blast(group){
+  busy=true;
+  for(const {r,c} of group){ grid[r][c].el.classList.add('out'); grid[r][c]=null; }
+  await wait(260);
+  bw.querySelectorAll('.out').forEach(e=>e.remove());
+
+  let guard=0;
+  while(guard++<40){
+    const moved=gravity();
+    if(moved) await wait(200);
+    const exited=exitStones();
+    if(exited>0) await wait(220);
+    if(!moved && exited===0) break;
+  }
+  refill();
   await wait(240);
 
-  if (findMatches().length === 0) {
-    swapPair(a, b);
-    await wait(240);
-    busy = false;
-    return;
-  }
-
-  ST.mv--;
-  Q('mN').textContent = ST.mv;
-  if (ST.mv <= 4) Q('mN').classList.add('moves-warn');
-
-  await cascade();
-
-  if (!won) checkEnd();
-  busy = false;
+  busy=false;
+  if(!won&&!lost) checkWin();
 }
 
-function swapPair(a, b) {
-  grid[a.r][a.c] = b;
-  grid[b.r][b.c] = a;
-  const ar=a.r, ac=a.c;
-  place(a, b.r, b.c);
-  place(b, ar, ac);
-}
-
-function place(t, r, c) {
-  t.r=r; t.c=c;
-  t.el.style.top  = r*(TS+GAP) + 'px';
-  t.el.style.left = c*(TS+GAP) + 'px';
-}
-
-// ── MATCH-3 ENGINE ─────────────────────────────────────────
-function findMatches() {
-  const hit = new Set();
-  // horizontal
-  for (let r=0;r<ROWS;r++) {
-    let run=1;
-    for (let c=1;c<=COLS;c++) {
-      const ok = c<COLS && grid[r][c] && grid[r][c-1] && grid[r][c].color===grid[r][c-1].color;
-      if (ok) { run++; }
-      else { if(run>=3) for(let k=c-run;k<c;k++) hit.add(r*COLS+k); run=1; }
-    }
-  }
-  // vertical
-  for (let c=0;c<COLS;c++) {
-    let run=1;
-    for (let r=1;r<=ROWS;r++) {
-      const ok = r<ROWS && grid[r]?.[c] && grid[r-1]?.[c] && grid[r][c].color===grid[r-1][c].color;
-      if (ok) { run++; }
-      else { if(run>=3) for(let k=r-run;k<r;k++) hit.add(k*COLS+c); run=1; }
-    }
-  }
-  return [...hit].map(idx => ({r:Math.floor(idx/COLS), c:idx%COLS}));
-}
-
-async function cascade() {
-  let matches = findMatches();
-  while (matches.length > 0) {
-    // count objective tiles
-    for (const {r,c} of matches) {
-      const t = grid[r][c];
-      if (t && t.color === LVS[ST.lvl].oc) ST.col++;
-    }
-    ST.kerb += matches.length;
-    Q('mK').textContent = ST.kerb;
-    updateObjective();
-    if (won) return;
-
-    // remove
-    for (const {r,c} of matches) {
-      const t = grid[r][c];
-      if (!t) continue;
-      grid[r][c] = null;
-      t.el.classList.add('out');
-    }
-    await wait(320);
-    gw.querySelectorAll('.out').forEach(el => el.remove());
-
-    // gravity
-    gravity();
-    await wait(260);
-
-    // refill
-    refill();
-    await wait(280);
-
-    matches = findMatches();
-  }
-}
-
-function gravity() {
-  for (let c=0;c<COLS;c++) {
-    let wr = ROWS-1;
-    for (let r=ROWS-1;r>=0;r--) {
-      if (grid[r][c]) {
-        if (r!==wr) { grid[wr][c]=grid[r][c]; grid[r][c]=null; place(grid[wr][c],wr,c); }
+function gravity(){
+  let moved=false;
+  for(let c=0;c<COLS;c++){
+    let wr=ROWS-1;
+    for(let r=ROWS-1;r>=0;r--){
+      if(grid[r][c]){
+        if(r!==wr){ grid[wr][c]=grid[r][c]; grid[r][c]=null; place(grid[wr][c],wr,c); moved=true; }
         wr--;
       }
     }
-    for (let r=wr;r>=0;r--) grid[r][c]=null;
+    for(let r=wr;r>=0;r--) grid[r][c]=null;
   }
+  return moved;
 }
 
-function refill() {
-  for (let c=0;c<COLS;c++) {
+function exitStones(){
+  let cnt=0;
+  for(let c=0;c<COLS;c++){
+    const cell=grid[ROWS-1][c];
+    if(cell&&cell.type==='stone'){
+      grid[ROWS-1][c]=null;
+      flyStone(cell.el);
+      ST.dropped++;
+      cnt++;
+    }
+  }
+  if(cnt>0){
+    ST.danger=Math.max(0,ST.danger-cnt*4);
+    updateDanger();
+    updateObjective();
+    addWallStone(cnt);
+  }
+  return cnt;
+}
+
+function refill(){
+  for(let c=0;c<COLS;c++){
     let sp=1;
-    for (let r=0;r<ROWS;r++) {
-      if (!grid[r][c]) {
-        const color = CLRS[Math.floor(Math.random()*CLRS.length)];
-        const el = document.createElement('div');
-        el.className = `tile c-${color} enter`;
-        const fs = Math.round(TS*0.46);
-        el.style.cssText = `width:${TS}px;height:${TS}px;font-size:${fs}px;left:${c*(TS+GAP)}px;top:${-(sp*(TS+GAP))}px`;
-        el.textContent = EM[color];
-        const t = {color, r, c, el};
-        el.addEventListener('click', ()=>{ if(!busy) onTileClick(t); });
-        gw.appendChild(el);
-        grid[r][c] = t;
-        const fr = r*(TS+GAP);
-        requestAnimationFrame(()=>requestAnimationFrame(()=>{ el.classList.remove('enter'); el.style.top=fr+'px'; }));
+    for(let r=0;r<ROWS;r++){
+      if(!grid[r][c]){
+        const color=rndColor();
+        const el=document.createElement('div');
+        el.className=`tile c-${color} enter`;
+        const fs=Math.round(TS*0.5);
+        el.style.cssText=`width:${TS}px;height:${TS}px;font-size:${fs}px;left:${c*(TS+GAP)}px;top:${-(sp*(TS+GAP))}px`;
+        el.textContent=EM[color];
+        const t={type:'tile',color,r,c,el};
+        el.addEventListener('click',()=>{ if(!busy&&!won&&!lost) tap(t); });
+        bw.appendChild(el);
+        grid[r][c]=t;
+        const fr=r*(TS+GAP);
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{el.classList.remove('enter');el.style.top=fr+'px';}));
         sp++;
       }
     }
   }
 }
 
-// ── OBJECTIVE & SCENE ──────────────────────────────────────
-function updateObjective() {
-  const L = LVS[ST.lvl];
-  const n   = Math.min(ST.col, L.on);
-  const pct = n / L.on;
-  Q('oFl').style.width = (pct*100) + '%';
-  Q('oCt').textContent = `${n}/${L.on}`;
-  updateScene(pct);
-  if (pct >= 1 && !won) { won = true; setTimeout(winLevel, 350); }
+function place(t,r,c){ t.r=r;t.c=c; t.el.style.top=r*(TS+GAP)+'px'; t.el.style.left=c*(TS+GAP)+'px'; }
+
+// ── DRAGON / OBJECTIVE ──────────────────────────────────
+function startTimer(){
+  ST.timer=setInterval(()=>{
+    if(won||lost) return;
+    ST.danger=Math.min(100,ST.danger+ST.rate);
+    updateDanger();
+    if(ST.danger>=100){ clearInterval(ST.timer); loseLevel(); }
+  },100);
 }
 
-function updateScene(pct) {
-  const L   = LVS[ST.lvl];
-  const el  = Q('dEl');
-  const kg  = Q('king');
+function updateDanger(){
+  Q('dzFl').style.width=ST.danger+'%';
+  Q('dragon').style.left=(86-66*ST.danger/100)+'%';
+  if(ST.danger>70) Q('dragon').classList.add('angry');
+  else Q('dragon').classList.remove('angry');
+}
 
-  if (el) {
-    if (L.danger==='water')  el.style.height = (52 - 52*pct) + '%';
-    if (L.danger==='fire')   el.style.width  = (34 - 34*pct) + '%';
-    if (L.danger==='gate') {
-      el.style.opacity = 1-pct;
-      el.textContent   = pct>=.5 ? '🔓' : '🔒';
-    }
-    if (L.danger==='bridge') el.style.width  = (pct * 52) + '%';
-    if (L.danger==='dragon') {
-      el.style.opacity   = 1-pct;
-      el.style.transform = `translateX(${pct*-140}%)`;
-    }
+function updateObjective(){
+  const n=Math.min(ST.dropped,ST.total);
+  Q('oCt').textContent=`${n}/${ST.total}`;
+  Q('oFl').style.width=(n/ST.total*100)+'%';
+}
+
+function addWallStone(cnt){
+  const wall=Q('wall');
+  for(let i=0;i<cnt;i++){
+    const s=document.createElement('span');
+    s.className='ws'; s.textContent='🪨';
+    wall.appendChild(s);
   }
-
-  if (pct>=1) { kg.textContent='😄'; kg.className='king happy'; }
-  else if (pct>.5) { kg.textContent=L.ke; kg.className='king idle'; }
-  else { kg.textContent='😱'; kg.className='king scared'; }
 }
 
-// ── END CONDITIONS ─────────────────────────────────────────
-function checkEnd() {
-  if (ST.mv <= 0 && !won) failLevel();
+function flyStone(el){
+  const a=el.getBoundingClientRect();
+  const wall=Q('wall').getBoundingClientRect();
+  const f=document.createElement('div');
+  f.className='fly-stone';
+  f.style.cssText=`left:${a.left}px;top:${a.top}px;width:${a.width}px;height:${a.height}px`;
+  document.body.appendChild(f);
+  el.remove();
+  requestAnimationFrame(()=>{
+    f.style.left=(wall.left+Math.random()*30)+'px';
+    f.style.top=wall.top+'px';
+    f.style.width='14px'; f.style.height='14px';
+    f.style.opacity='0';
+  });
+  setTimeout(()=>f.remove(),520);
 }
 
-function winLevel() {
-  confetti();
-  Q('ovWx').textContent = LVS[ST.lvl].wt;
-  const btn = Q('ovWb');
-  if (ST.lvl >= LVS.length-1) { btn.textContent='🏆 Spiel abgeschlossen!'; btn.onclick=showVictory; }
-  else { btn.textContent='Weiter →'; btn.onclick=nextLevel; }
-  Q('ovW').classList.add('show');
+// ── WIN / LOSE ──────────────────────────────────────────
+function checkWin(){
+  if(ST.dropped>=ST.total){
+    won=true; clearInterval(ST.timer);
+    Q('dragon').classList.remove('angry');
+    Q('king').textContent='😄';
+    confetti();
+    Q('ovWx').textContent=LVS[ST.lvl].wt;
+    const b=Q('ovWb');
+    if(ST.lvl>=LVS.length-1){ b.textContent='🏆 Spiel abgeschlossen!'; b.onclick=victory; }
+    else { b.textContent='Weiter →'; b.onclick=nextLevel; }
+    setTimeout(()=>Q('ovW').classList.add('show'),500);
+  }
 }
 
-function failLevel() {
+function loseLevel(){
+  if(won||lost) return;
+  lost=true;
+  Q('dragon').style.left='6%';
+  Q('king').className='king-fig eaten';
   ST.lives--;
   updateLives();
-  Q('ovFx').textContent = LVS[ST.lvl].ft;
-  if (ST.lives <= 0) Q('ovO').classList.add('show');
-  else Q('ovF').classList.add('show');
+  Q('ovFx').textContent=LVS[ST.lvl].ft;
+  setTimeout(()=>{
+    if(ST.lives<=0) Q('ovO').classList.add('show');
+    else Q('ovF').classList.add('show');
+  },700);
 }
 
-function nextLevel() { ST.lvl++; Q('ovW').classList.remove('show'); loadLv(ST.lvl); }
-function retryLv()   { Q('ovF').classList.remove('show'); loadLv(ST.lvl); }
-function toStart()   { ['ovW','ovF','ovO'].forEach(id=>Q(id).classList.remove('show')); Q('gs').classList.remove('active'); Q('ss').classList.add('active'); }
-
-function showVictory() {
-  Q('ovW').querySelector('.ov-ti').textContent = 'Königreich gerettet!';
-  Q('ovWx').textContent = 'Alle 5 Level gemeistert! Du hast den König in Sicherheit gebracht! 👑';
-  Q('ovWb').textContent = 'Nochmal spielen';
-  Q('ovWb').onclick = toStart;
+function nextLevel(){ ST.lvl++; Q('ovW').classList.remove('show'); loadLv(ST.lvl); }
+function retryLv(){ Q('ovF').classList.remove('show'); loadLv(ST.lvl); }
+function toStart(){ clearInterval(ST.timer); ['ovW','ovF','ovO'].forEach(id=>Q(id).classList.remove('show')); Q('gs').classList.remove('active'); Q('ss').classList.add('active'); }
+function victory(){
+  Q('ovW').querySelector('.ov-ti').textContent='Reich gerettet!';
+  Q('ovWx').textContent='Alle 5 Level gemeistert! Der König dankt dir, Held! 👑';
+  Q('ovWb').textContent='Nochmal spielen';
+  Q('ovWb').onclick=toStart;
   confetti();
 }
 
-// ── HELPERS ────────────────────────────────────────────────
-function Q(id) { return document.getElementById(id); }
-function wait(ms) { return new Promise(r=>setTimeout(r,ms)); }
-function updateLives() { Q('hdrL').textContent = Array.from({length:3},(_,i)=>i<ST.lives?'❤️':'🖤').join(''); }
-
-function confetti() {
-  const c = Q('cc'); c.innerHTML='';
+// ── HELPERS ─────────────────────────────────────────────
+function Q(id){ return document.getElementById(id); }
+function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function updateLives(){ Q('hdrL').textContent=Array.from({length:3},(_,i)=>i<ST.lives?'❤️':'🖤').join(''); }
+function confetti(){
+  const c=Q('cc'); c.innerHTML='';
   const es=['⭐','🌟','✨','💫','🎊','🎉','👑'];
-  for (let i=0;i<22;i++) {
+  for(let i=0;i<22;i++){
     const el=document.createElement('div');
-    el.className='conf';
-    el.textContent=es[Math.floor(Math.random()*es.length)];
+    el.className='conf'; el.textContent=es[(Math.random()*es.length)|0];
     el.style.cssText=`left:${Math.random()*100}vw;top:-2rem;font-size:${1+Math.random()*1.5}rem;animation-delay:${Math.random()*.8}s;animation-duration:${1.5+Math.random()}s`;
     c.appendChild(el);
   }
